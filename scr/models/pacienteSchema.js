@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const moment = require("moment-timezone");
+
 const pacienteSchema = new mongoose.Schema({
     nombre:{
         type: String,
@@ -17,7 +17,6 @@ const pacienteSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-  
     estatusCliente:{
         type: String,
         enum: ['Activo', 'Inactivo']
@@ -25,7 +24,8 @@ const pacienteSchema = new mongoose.Schema({
     password:{
         type: String,
         required: true
-    }
+    },
+    citas:[{ type: mongoose.Schema.Types.ObjectId, ref: 'Cita'}]
     
 });
 

@@ -13,10 +13,10 @@ const citaSchema = new mongoose.Schema({
     },
     NotasCitas: String,
     modalidad:{
-type: String,
-enum: ['Presencial', 'En línea'],
-required: true
-}
+        type: String,
+        enum: ['Presencial', 'En línea'],
+        required: true
+    }
 });
 
 
@@ -39,7 +39,8 @@ citaSchema.statics.obtenerCitasConFechaEnEspañol = function(callback) {
                 },
                 EstatusCita: 1,
                 NotasCitas: 1
-            }
+            },
+            $sort: {date: 1}
         }
     ], callback);
 };
