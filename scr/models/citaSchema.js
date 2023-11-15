@@ -11,7 +11,12 @@ const citaSchema = new mongoose.Schema({
         required: true,
         enum: ['Agendada', 'Confirmada', 'Cancelada', 'Realizada']
     },
-    NotasCitas: String
+    NotasCitas: String,
+    modalidad:{
+type: String,
+enum: ['Presencial', 'En línea'],
+required: true
+}
 });
 
 
