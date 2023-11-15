@@ -21,6 +21,10 @@ db.once('open', () => {
 });
 
 app.use(express.json());
+app.use(cors({
+    origin: '*',
+    methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
+}));
 
 const apiRouter = require('./routes/citas'); 
 app.use('/cita', apiRouter);
