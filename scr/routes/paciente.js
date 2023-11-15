@@ -1,8 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const Pacientes = require('../models/pacienteSchema');
+const jwt = require('jsonwebtoken');
+const jwtSecretKey = 'XDEJUEMPLO';
+
+function createToken(user) {
+  const payload = {
+    userId: user._id,
+    email: user.correo,
+  };
 
 
+  const expiration = '1h';
+
+  return jwt.sign(payload, jwtSecretKey, { expiresIn: expiration });
+}
 router.post('/', async (req, res) => {
   const newItemData = req.body;
 
@@ -11,7 +23,8 @@ router.post('/', async (req, res) => {
     const result = await newItem.save();
 
     if (result) {
-      res.status(201).json(result);
+      const token = createToken(result);
+      res.status(201).json({ token, result });
     } else {
       res.status(500).json({ error: 'Error en la inserción de datos' });
     }
@@ -21,6 +34,37 @@ router.post('/', async (req, res) => {
   }
 });
 
+function authenticateToken(req, res, next) {
+  const token = req.headers['authorization'];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  jwt.verify(token, jwtSecretKey, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: 'Token is not valid' });
+    }
+    req.user = user;
+    next();
+  });
+}
+
+router.get('/:_id', authenticateToken, async (req, res) => {
+  const itemId = req.params._id; 
+
+  try {
+    const item = await Pacientes.findOne({ _id: itemId });
+
+    if (item) {
+      res.json(item);
+    } else {
+      res.status(404).json({ error: 'Objeto no encontrado' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 router.get('/', async (req, res) => {
   try {
@@ -32,20 +76,7 @@ router.get('/', async (req, res) => {
 });
 
 
-router.get('/:_id', async (req, res) => {
-  const itemId = req.params.id;
 
-  try {
-    const item = await Pacientes.findOne({ _id: itemId });
-    if (item) {
-      res.json(item);
-    } else {
-      res.status(404).json({ error: 'Objeto no encontrado' });
-    }
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 
 router.put('/:_id', async (req, res) => {
@@ -65,7 +96,31 @@ router.put('/:_id', async (req, res) => {
   }
 });
 
+router.post('/RegistroUser', async (req, res) => {
+  const newItemData = req.body;
 
+  const existingItem = await Pacientes.findOne({
+    $or: [{ correo: newItemData.correo }, { telefono: newItemData.telefono }],
+  });
+
+  if (existingItem) {
+    return res.status(400).json({ error: 'Correo o número de teléfono ya existen' });
+  }
+
+  try {
+    const newItem = new Pacientes(newItemData);
+    const result = await newItem.save();
+
+    if (result) {
+      res.status(201).json(result);
+    } else {
+      res.status(500).json({ error: 'Error en la inserción de datos' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
 router.delete('/:_id', async (req, res) => {
   const itemId = req.params.email;
 
