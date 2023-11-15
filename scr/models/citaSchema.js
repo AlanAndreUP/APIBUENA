@@ -14,6 +14,12 @@ const citaSchema = new mongoose.Schema({
     NotasCitas: String
 });
 
+
+citaSchema.pre('save', function (next) {
+    this.FechaCita = moment(this.FechaCita).tz('America/Mexico_City').toDate();
+    next();
+});
+
 citaSchema.statics.obtenerCitasConFechaEnEspañol = function(callback) {
     this.aggregate([
         {
@@ -35,4 +41,4 @@ citaSchema.statics.obtenerCitasConFechaEnEspañol = function(callback) {
 
 const Cita = mongoose.model('Citas', citaSchema);
 
-
+module.exports = Cita;
