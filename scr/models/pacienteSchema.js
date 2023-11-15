@@ -17,14 +17,7 @@ const pacienteSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-    municipio:{
-        type: String,
-        required: true
-    },
-    estado:{
-        type: String,
-        required: true
-    },
+  
     estatusCliente:{
         type: String,
         enum: ['Activo', 'Inactivo']
