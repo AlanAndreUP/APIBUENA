@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Pacientes = require('../models/citaSchema');
+const Pacientes = require('../models/pacienteSchema');
 
 
 router.post('/', async (req, res) => {

@@ -1,48 +1,48 @@
+
 const request = require('supertest');
 const express = require('express');
 const app = express();
-const mongoose = require('mongoose');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const apiRouter = require('../routes/citas'); 
-const Cita = require('../models/UsuarioModel'); 
-
-
-mongoose.connect('mongodb+srv://223208:Jaguares34.1@cluster0.swir3km.mongodb.net/?retryWrites=true&w=majority', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+const uri = "mongodb+srv://223208:Jaguares34.1@cluster0.swir3km.mongodb.net/?retryWrites=true&w=majority";
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
 });
+
 
 beforeAll(async () => {
-  await mongoose.connection;
-
+  await client.connect();
+  await client.db("admin").command({ ping: 1 });
   app.use(express.json());
-  app.use('/api', apiRouter); 
-
+  app.use('/api', apiRouter(client)); 
 });
 
+
 afterAll(async () => {
-  await mongoose.connection.close();
+  await client.close();
 });
 
 describe('CRUD Tests', () => {
   let newItemId;
 
   it('Debería crear un nuevo elemento', async () => {
-  
     const newItemData = {
-      idUser: 1,
-      nombre: "Jonathan Dzul",
-      email: "oaxaco@gmail.com"
-  }
-
+        IDCliente: '652605357c5aa90ffac5ec91',
+        FechaCita: new Date('2023-10-10T12:00:00Z'),
+        EstatusCita: 'Programada',
+        NotasCitas: 'Notas sobre la cita',
+       };
     const response = await request(app)
       .post('/api')
       .send(newItemData);
 
     expect(response.statusCode).toBe(201);
-    
-    expect(response.body.id).toBe(newItemData.id); 
-   console.log(response.body);
-    newItemId = response.body.email;
+    expect(response.body.name).toBe(newItemData.name);
+    newItemId = response.body._id;
   });
 
   it('Debería obtener todos los elementos', async () => {
@@ -55,20 +55,19 @@ describe('CRUD Tests', () => {
 
   it('Debería obtener un elemento por ID', async () => {
     const response = await request(app)
-      .get(`/api/${newItemId}`);
+      .get(`/api/12`);
+
     expect(response.statusCode).toBe(200);
   });
 
   it('Debería actualizar un elemento', async () => {
-    const updatedItemData = { email: newItemId }; 
+    const updatedItemData = { name: 'Elemento Actualizado' };
     const response = await request(app)
       .put(`/api/${newItemId}`)
       .send(updatedItemData);
-      console.log(response.error);
+
     expect(response.statusCode).toBe(200);
-    
-    expect(response.body.email).toBe(updatedItemData.email);
-  
+    expect(response.body.name).toBe(updatedItemData.name);
   });
 
   it('Debería eliminar un elemento', async () => {

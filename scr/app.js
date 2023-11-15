@@ -2,8 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
 const port = process.env.PORT || 3000;
+require('dotenv').config();
 
-const uri = "mongodb+srv://223208:Jaguares34.1@cluster0.swir3km.mongodb.net/pruebapsico";
+const uri = process.env.MONGODB_URI;
 mongoose.connect(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -22,14 +23,14 @@ db.once('open', () => {
 app.use(express.json());
 
 const apiRouter = require('./routes/citas'); 
-app.use('/citas', apiRouter);
+app.use('/cita', apiRouter);
 
-const apiRouterClientes = require('./routes/clientes'); 
-app.use('/clientes', apiRouterClientes);
+const apiRouterClientes = require('./routes/paciente'); 
+app.use('/paciente', apiRouterClientes);
 
-const apiRouterUsuarios = require('./routesSQL/login'); 
-app.use('/usuarios', apiRouterUsuarios);
+
 
 app.listen(port, () => {
   console.log(`Servidor en ejecución en el puerto ${port}`);
 });
+ 
