@@ -134,7 +134,8 @@ router.post('/RegistroUser', async (req, res) => {
     const result = await newItem.save();
 
     if (result) {
-      res.status(201).json(result);
+        const token = createToken(result);
+      res.status(201).json({ token, result });
     } else {
       res.status(500).json({ error: 'Error en la inserción de datos' });
     }
