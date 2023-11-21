@@ -49,7 +49,29 @@ function authenticateToken(req, res, next) {
     next();
   });
 }
+router.post('/login', async (req, res) => {
+  const { correo, telefono, password } = req.body;
 
+  try {
+    const user = await Pacientes.findOne({
+      $or: [{ correo: correo }, { telefono: telefono }],
+    });
+
+    if (!user) {
+      return res.status(401).json({ error: 'Usuario no encontrado' });
+    }
+
+    if (user.password !== password) {
+      return res.status(401).json({ error: 'Contraseña incorrecta' });
+    }
+    
+    const token = createToken(user);
+    res.json({ token, user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
 router.get('/:_id', authenticateToken, async (req, res) => {
   const itemId = req.params._id; 
 
