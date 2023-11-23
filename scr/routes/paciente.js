@@ -97,6 +97,22 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/order', async (req, res) => {
+  try {
+      const items = await Pacientes.aggregate([
+          {
+              $match: { 'citas.1': { $exists: true } } // Filtra solo pacientes con más de una cita
+          },
+          {
+              $sort: { 'nombre': 1 } // Ordena alfabéticamente por nombre
+          }
+      ]);
+
+      res.json(items);
+  } catch (err) {
+      res.status(500).json({ error: err.message });
+  }
+});
 
 
 router.post('/agregarCita', async (req, res) => {
