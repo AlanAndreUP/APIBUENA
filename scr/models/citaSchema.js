@@ -16,6 +16,10 @@ const citaSchema = new mongoose.Schema({
         type: String,
         enum: ['Presencial', 'En línea'],
         required: true
+    },
+    idUser:{
+        type:Number,
+        require:true
     }
 });
 
