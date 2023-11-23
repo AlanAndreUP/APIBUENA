@@ -3,7 +3,7 @@ const router = express.Router();
 const Pacientes = require('../models/pacienteSchema');
 const jwt = require('jsonwebtoken');
 const jwtSecretKey = 'XDEJUEMPLO';
-
+const Citas = require('../models/citaSchema');
 function createToken(user) {
   const payload = {
     userId: user._id,
@@ -99,7 +99,25 @@ router.get('/', async (req, res) => {
 
 
 
+router.post('/agregarCita', async (req, res) => {
+  const { idPaciente, datosCita } = req.body; // Asegúrate de recibir el ID del paciente y los datos de la cita
 
+  try {
+      const nuevaCita = new Citas(datosCita);
+      const citaGuardada = await nuevaCita.save();
+
+      await Pacientes.findByIdAndUpdate(
+          idPaciente,
+          { $push: { citas: citaGuardada._id } },
+          { new: true }
+      );
+
+      res.status(201).json(citaGuardada);
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: err.message });
+  }
+});
 
 router.put('/:_id', async (req, res) => {
   const itemId = req.params.email;
