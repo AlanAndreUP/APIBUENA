@@ -61,12 +61,12 @@ router.post('/', async (req, res) => {
 });
 
 // Update an item by idUser
-router.put('/:idUser', async (req, res) => {
-  const itemId = req.params.idUser;
+router.put('/:_id', async (req, res) => {
+  const itemId = req.params._id;
   const updatedItemData = req.body;
 
   try {
-    const result = await Citas.findOneAndUpdate({ idUser: itemId }, updatedItemData, { new: true });
+    const result = await Citas.findOneAndUpdate({ _id: itemId }, updatedItemData, { new: true });
 
     if (result) {
       res.json(result);
@@ -79,11 +79,11 @@ router.put('/:idUser', async (req, res) => {
 });
 
 // Delete an item by idUser
-router.delete('/:idUser', async (req, res) => {
-  const itemId = req.params.idUser;
+router.delete('/:_id', async (req, res) => {
+  const itemId = req.params._id;
 
   try {
-    const result = await Citas.findOneAndRemove({ idUser: itemId });
+    const result = await Citas.findOneAndRemove({ _id: itemId });
 
     if (result) {
       res.json({ message: 'El objeto fue eliminado' });
