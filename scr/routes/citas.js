@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
 
 
 router.get('/:_id', async (req, res) => {
-  const itemId = req.params.id;
+  const itemId = req.params.idUser;
   
   try {
     const item = await Citas.findOne({ _id: itemId });
