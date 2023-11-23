@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Citas = require('../models/citaSchema');
 
-
+// Get all items
 router.get('/', async (req, res) => {
   try {
     const items = await Citas.find();
@@ -12,8 +12,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-
-router.get('/:_id', async (req, res) => {
+// Get a single item by idUser
+router.get('/:idUser', async (req, res) => {
   const itemId = req.params.idUser;
   
   try {
@@ -27,7 +27,21 @@ router.get('/:_id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+router.get('/all/:idUser', async (req, res) => {
+  const idUser = req.params.idUser;
 
+  try {
+    const items = await Citas.find({ idUser: idUser });
+    if (items && items.length > 0) {
+      res.json(items);
+    } else {
+      res.status(404).json({ message: 'No se encontraron citas para este usuario' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+// Create a new item
 router.post('/', async (req, res) => {
   const newItemData = req.body;
 
@@ -46,12 +60,13 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:_id', async (req, res) => {
-  const itemId = req.params.email;
+// Update an item by idUser
+router.put('/:idUser', async (req, res) => {
+  const itemId = req.params.idUser;
   const updatedItemData = req.body;
 
   try {
-    const result = await Citas.findOneAndUpdate({ email: itemId }, updatedItemData, { new: true });
+    const result = await Citas.findOneAndUpdate({ idUser: itemId }, updatedItemData, { new: true });
 
     if (result) {
       res.json(result);
@@ -63,12 +78,12 @@ router.put('/:_id', async (req, res) => {
   }
 });
 
-
-router.delete('/:_id', async (req, res) => {
-  const itemId = req.params.email;
+// Delete an item by idUser
+router.delete('/:idUser', async (req, res) => {
+  const itemId = req.params.idUser;
 
   try {
-    const result = await Citas.findOneAndRemove({ email: itemId });
+    const result = await Citas.findOneAndRemove({ idUser: itemId });
 
     if (result) {
       res.json({ message: 'El objeto fue eliminado' });
