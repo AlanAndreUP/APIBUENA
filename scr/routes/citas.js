@@ -17,7 +17,7 @@ router.get('/:_id', async (req, res) => {
   const itemId = req.params.idUser;
   
   try {
-    const item = await Citas.findOne({ _id: itemId });
+    const item = await Citas.findOne({ idUser: itemId });
     if (item) {
       res.json(item);
     } else {
