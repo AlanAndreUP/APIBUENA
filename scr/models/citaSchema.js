@@ -18,7 +18,7 @@ const citaSchema = new mongoose.Schema({
         required: true
     },
     idUser:{
-        type:Number,
+        type:String,
         require:true
     }
 });
