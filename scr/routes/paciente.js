@@ -116,7 +116,7 @@ router.get('/order', async (req, res) => {
 
 
 router.post('/agregarCita', async (req, res) => {
-  const { idPaciente, datosCita } = req.body; // Asegúrate de recibir el ID del paciente y los datos de la cita
+  const { idPaciente, datosCita } = req.body;
 
   try {
       const nuevaCita = new Citas(datosCita);
