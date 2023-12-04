@@ -36,7 +36,7 @@ app.use('/paciente', apiRouterClientes);
 
 
 
-const wss = new WebSocket.Server({ port: port });
+const wss = new WebSocket.Server(port);
 
 
 wss.on('connection', (ws) => {
