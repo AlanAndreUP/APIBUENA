@@ -2,11 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 40000;
 const WebSocket = require('ws');
 require('dotenv').config();
 const { getInitialMessage, processMessage } = require('./routes/chatbot');
-const uri = process.env.MONGODB_URI;
+const uri = "mongodb+srv://223208:bRJCca6JSUpWBpT2@cluster0.swir3km.mongodb.net/Pruebapsico";
 mongoose.connect(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -36,8 +36,7 @@ app.use('/paciente', apiRouterClientes);
 
 
 
-const wss = new WebSocket.Server(port);
-
+const wss = new WebSocket.Server({ port: 4001 });
 
 wss.on('connection', (ws) => {
   ws.send(getInitialMessage());
