@@ -22,9 +22,8 @@ jobs:
           port: 22
           script: |
                    cd /home/ubuntu/APIBUENA
-                   git pull origin master
+                   git pull origin main
                    npm install
-                    npm run build
                       pm2 stop all
                         pm2 start npm --name "APIBUENA" -- run dev 
                            sudo systemctl restart nginx
