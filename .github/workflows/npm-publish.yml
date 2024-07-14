@@ -16,15 +16,15 @@ jobs:
       - name: SSH into EC2 and deploy
         uses: appleboy/ssh-action@master
         with:
-          host: ec2-52-3-173-240.compute-1.amazonaws.com
+          host: ec2-34-205-156-66.compute-1.amazonaws.com
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           port: 22
           script: |
-                   cd /home/ubuntu/rutasegura-web
+                   cd /home/ubuntu/APIBUENA
                    git pull origin master
                    npm install
                     npm run build
                       pm2 stop all
-                        pm2 start npm --name "rutasegura-web" -- run dev 
+                        pm2 start npm --name "APIBUENA" -- run dev 
                            sudo systemctl restart nginx
