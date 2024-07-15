@@ -1,5 +1,8 @@
+// chatbot.ts
 
-function getInitialMessage() {
+import { Request, Response } from 'express';
+
+export function getInitialMessage(): string {
     return "Hola, soy tu Chatbot. Por favor, elige una opción:\n" +
            "1. Como se agenda una cita.\n" +
            "2. Como modifico una cita.\n" +
@@ -8,9 +11,8 @@ function getInitialMessage() {
            "5. ¡Puse información errónea! ¿Qué hago.";
 }
 
-function processMessage(userInput) {
-
-    switch (userInput.toString()) {
+export function processMessage(userInput: string): string {
+    switch (userInput) {
         case '1':
             return "a.";
         case '2':
@@ -26,4 +28,12 @@ function processMessage(userInput) {
     }
 }
 
-module.exports = { getInitialMessage, processMessage };
+export default function handler(req: Request, res: Response): void {
+    if (req.method === 'POST') {
+        const { message } = req.body;
+        const response = processMessage(message);
+        res.status(200).json({ response });
+    } else {
+        res.status(200).json({ response: getInitialMessage() });
+    }
+}
