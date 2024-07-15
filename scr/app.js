@@ -12,6 +12,8 @@ mongoose.connect(uri, {
   useUnifiedTopology: true,
 });
 
+//pruebita
+
 const db = mongoose.connection;
 
 db.on('error', (error) => {
