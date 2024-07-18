@@ -4,6 +4,8 @@ import cors from 'cors';
 import { config } from 'dotenv';
 import { getInitialMessage, processMessage } from './routes/chatbot';
 import { WebSocketServer } from 'ws';
+import pasajerosRoutes from './routes/pasajeros'; 
+import usuariosRoutes from './routes/usuario';
 
 config();
 
@@ -27,7 +29,8 @@ db.once('open', () => {
 });
 
 app.use(express.json());
-
+app.use('/pasajeros', pasajerosRoutes);  
+app.use('/user', usuariosRoutes);
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH']
