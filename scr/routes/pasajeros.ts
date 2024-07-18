@@ -23,7 +23,7 @@ const authenticateToken: RequestHandler = (req: IUserRequest, res: Response, nex
     });
 };
 
-router.post('/pasajeros', authenticateToken, async (req: Request, res: Response) => {
+router.post('/pasajeros', async (req: Request, res: Response) => {
     const { fecha, cantidad } = req.body;
 
     try {
@@ -40,7 +40,7 @@ router.post('/pasajeros', authenticateToken, async (req: Request, res: Response)
     }
 });
 
-router.get('/pasajeros', authenticateToken, async (req: Request, res: Response) => {
+router.get('/pasajeros', async (req: Request, res: Response) => {
     const { fecha } = req.query;
 
     try {
@@ -54,7 +54,7 @@ router.get('/pasajeros', authenticateToken, async (req: Request, res: Response) 
 });
 
 // Rutas para calcular las ganancias
-router.get('/ganancias/dia', authenticateToken, async (req: Request, res: Response) => {
+router.get('/ganancias/dia', async (req: Request, res: Response) => {
     const { fecha } = req.query;
 
     try {
@@ -68,7 +68,7 @@ router.get('/ganancias/dia', authenticateToken, async (req: Request, res: Respon
     }
 });
 
-router.get('/ganancias/semana', authenticateToken, async (req: Request, res: Response) => {
+router.get('/ganancias/semana', async (req: Request, res: Response) => {
     const { fechaInicio, fechaFin } = req.query;
 
     try {
