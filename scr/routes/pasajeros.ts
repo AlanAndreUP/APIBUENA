@@ -23,7 +23,7 @@ const authenticateToken: RequestHandler = (req: IUserRequest, res: Response, nex
     });
 };
 
-router.post('/pasajeros', async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
     const { fecha, cantidad } = req.body;
 
     try {
@@ -40,7 +40,7 @@ router.post('/pasajeros', async (req: Request, res: Response) => {
     }
 });
 
-router.get('/pasajeros', async (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
     const { fecha } = req.query;
 
     try {
