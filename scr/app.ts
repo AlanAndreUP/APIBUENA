@@ -28,13 +28,16 @@ db.once('open', () => {
   console.log('Conexión exitosa a la base de datos MongoDB.');
 });
 
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
 app.use(express.json());
 app.use('/pasajeros', pasajerosRoutes);  
 app.use('/user', usuariosRoutes);
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH']
-}));
+
 
 const wss = new WebSocketServer({ port: 4001 });
 
