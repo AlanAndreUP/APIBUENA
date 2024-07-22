@@ -1,8 +1,8 @@
 import { Schema, model } from "mongoose";
 
-interface IChoferInfo {
+export interface IChoferInfo {
     totalViajes: number;
-    viajesDiarios: { [key: string]: number }; // key: date string, value: number of trips
+    viajesDiarios: { [key: string]: number }; 
     horarios: {
         salida: string;
         llegada: string;

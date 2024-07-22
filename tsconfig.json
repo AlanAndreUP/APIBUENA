@@ -9,6 +9,6 @@
     "outDir": "./dist",
     "rootDir": "./scr"
   },
-  "include": ["scr "],
+  "include": ["scr"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }
