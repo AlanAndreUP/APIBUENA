@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction, RequestHandler, Router } from 'express';
 import jwt from 'jsonwebtoken';
 import Kit, { IKit, IUbicacion } from "../models/kitSchema";
-import L from 'leaflet';
 import { Types } from 'mongoose';
 
 const router = Router();
@@ -18,7 +17,7 @@ interface IKitRequest extends Request {
 
 const authenticateToken: RequestHandler = (req: IKitRequest, res: Response, next: NextFunction) => {
     const token = req.headers['authorization']?.split(' ')[1];
-    if (!token) return res.status(401).json({ message: 'No autorizado' });
+    if (!token) return res.status(401).json({ message: 'No se proporciono token' });
 
     jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
         if (err) return res.status(403).json({ message: 'Token no válido' });
@@ -72,8 +71,6 @@ router.get('/gps/historial', authenticateToken, async (req: Request, res: Respon
         const fechaUnaHoraAntes = new Date(fechaUsuario.getTime() - (60 * 60 * 1000)); // 1 hora antes
 
         let unidades: IHistorialUnidad[] = [];
-        let masCorto = { lat: 0, lng: 0 };
-        let distanciaMasCorta = Infinity;
 
         kits.forEach(kit => {
             if (!kit.ubicacion) return;
@@ -81,26 +78,25 @@ router.get('/gps/historial', authenticateToken, async (req: Request, res: Respon
 
             let historial: IUbicacion[] = [];
             kit.historial.forEach(ubi => {
+                if (!kit.ubicacion) return;
+                if (!kit.historial) return;
+
+            let historial: Array<{ lat: number, long: number, fecha: Date }> = [];
+            kit.historial.forEach(ubi => {
                 if (!ubi.lat || !ubi.long) return;
                 const fechaUbi = new Date(ubi.fecha);
                 if (fechaUbi >= fechaUnaHoraAntes && fechaUbi <= fechaUsuario) {
                     historial.push({ lat: ubi.lat, long: ubi.long, fecha: ubi.fecha });
-                    
-                    // Calcula la distancia desde la ubicación del usuario a la ubicación del kit
-                    const distancia = L.latLng(ubicacionUsuario.lat, ubicacionUsuario.long).distanceTo(L.latLng(ubi.lat, ubi.long));
-                    if (distancia < distanciaMasCorta) {
-                        distanciaMasCorta = distancia;
-                        masCorto = { lat: ubi.lat, lng: ubi.long };
-                    }
                 }
             });
 
             if (historial.length > 0) {
                 unidades.push({ _idKit: kit._id, historial });
             }
-        });
+        })
+    });
 
-        return res.status(200).json({ unidades, masCorto });
+        return res.status(200).json(unidades);
     } catch (error) {
         res.status(500).json({ message: 'Error obteniendo el historial de GPS', error });
     }

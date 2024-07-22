@@ -11,7 +11,7 @@ import kitsRoutes from './routes/kits';
 config();
 
 const app = express();
-const port = process.env.PORT ?? 40000;
+const port = process.env.PORT ?? 4000;
 const uri = process.env.MONGODB_URI!;
 
 mongoose.connect(uri, {
@@ -38,7 +38,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(morgan('dev'));
 app.use('/pasajeros', pasajerosRoutes);  
-app.use('/user', usuariosRoutes);
+app.use('/users', usuariosRoutes);
 app.use('/kits', kitsRoutes);
 
 const wss = new WebSocketServer({ port: 4001 });
