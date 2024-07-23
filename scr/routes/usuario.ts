@@ -65,7 +65,7 @@ router.post('/login', async (req: Request, res: Response) => {
     }
 });
 
-router.put('/update', authenticateToken, async (req: IUserRequest, res: Response) => {
+router.put('/update', async (req: IUserRequest, res: Response) => {
     const { nombre, correo } = req.body;
     const userId = req.user?.id;
 
@@ -97,7 +97,7 @@ router.put('/change-password', authenticateToken, async (req: IUserRequest, res:
     }
 });
 
-router.put('/update-horarios', authenticateToken, async (req: IUserRequest, res: Response) => {
+router.put('/update-horarios', async (req: IUserRequest, res: Response) => {
     const { horarios } = req.body;
     const userId = req.user?.id;
 
@@ -109,7 +109,7 @@ router.put('/update-horarios', authenticateToken, async (req: IUserRequest, res:
     }
 });
 
-router.get('/info', authenticateToken, async (req: IUserRequest, res: Response) => {
+router.get('/info', async (req: IUserRequest, res: Response) => {
     const userId = req.user?.id;
 
     try {
@@ -122,7 +122,7 @@ router.get('/info', authenticateToken, async (req: IUserRequest, res: Response) 
     }
 });
 
-router.get('/drivers', authenticateToken, async (req: IUserRequest, res: Response) => {
+router.get('/drivers', async (req: IUserRequest, res: Response) => {
     try {
         const drivers = await Usuario.find({ tipo: 'conductor' }).select('-password');
         res.json(drivers);
@@ -131,7 +131,7 @@ router.get('/drivers', authenticateToken, async (req: IUserRequest, res: Respons
     }
 });
 
-router.get('/viajes', authenticateToken, async (req: IUserRequest, res: Response) => {
+router.get('/viajes', async (req: IUserRequest, res: Response) => {
     const userId = req.user?.id;
 
     try {
