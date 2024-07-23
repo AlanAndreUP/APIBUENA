@@ -73,15 +73,20 @@ router.get('/ganancias/semana', async (req: Request, res: Response) => {
     try {
         const pasajeros = await PasajerosPorDia.find({
             fecha: {
-                $gte: fechaInicio,
-                $lte: fechaFin
+                $gte: new Date(fechaInicio as string),
+                $lte: new Date(fechaFin as string)
             }
         });
+        const gananciasPorDia = pasajeros.reduce((acc, dia) => {
+            const day = new Date(dia.fecha).getDay();
+            acc[day] = (acc[day] || 0) + (dia.cantidad * TARIFA_POR_PASAJERO);
+            return acc;
+        }, {} as { [key: number]: number });
 
-        const totalPasajeros = pasajeros.reduce((acc, dia) => acc + dia.cantidad, 0);
-        const ganancias = totalPasajeros * TARIFA_POR_PASAJERO;
+        const earnings = Array(7).fill(0).map((_, i) => gananciasPorDia[i] || 0);
+        const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
-        res.json({ fechaInicio, fechaFin, ganancias });
+        res.json({ days, earnings });
     } catch (error) {
         res.status(500).json({ message: 'Error calculando las ganancias semanales', error });
     }
