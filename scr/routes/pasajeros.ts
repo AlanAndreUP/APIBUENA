@@ -1,11 +1,10 @@
 import express, { Request, Response, NextFunction, RequestHandler } from 'express';
-import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { IUsuario } from '../models/usuarioSchema';
 import PasajerosPorDia from '../models/pasajeros';
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'XDEJUEMPLO';
+const JWT_SECRET = process.env.JWT_SECRET ?? 'XDEJUEMPLO';
 const TARIFA_POR_PASAJERO = 20;
 
 interface IUserRequest extends Request {

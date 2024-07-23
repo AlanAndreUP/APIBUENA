@@ -5,7 +5,7 @@ import Usuario, { IUsuario } from '../models/usuarioSchema';
 import Kit from '../models/kitSchema';
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'XDEJUEMPLO';
+const JWT_SECRET = process.env.JWT_SECRET ?? 'XDEJUEMPLO';
 
 interface IUserRequest extends Request {
     user?: IUsuario & { id: string };
@@ -21,6 +21,19 @@ const authenticateToken: RequestHandler = (req: IUserRequest, res: Response, nex
         next();
     });
 };
+
+router.post('/create', async (req: Request, res: Response) => {
+    const { nombre, correo, password } = req.body;
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = new Usuario<IUsuario>({ nombre:nombre, correo:correo, password: hashedPassword, tipo: 'admin' });
+        await newUser.save();
+        res.status(201).json({ message: 'Administrador registrado exitosamente', data: newUser });
+    } catch (error) {
+        res.status(500).json({ message: 'Error registrando el usuario', error });
+    }
+})
 
 router.post('/register', async (req: Request, res: Response) => {
     const { nombre, correo, password } = req.body;

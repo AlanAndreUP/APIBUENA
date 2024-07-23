@@ -1,35 +1,45 @@
 import { Schema, model } from 'mongoose';
 
-interface IKit{
+export interface IUbicacion {
+    fecha: Date;
+    lat: number;
+    long: number;
+}
+
+export interface IKit{
     apodo: string;
-    ubicacion: {
-        lat: number;
-        long: number;
-    }
+    ubicacion?: IUbicacion;
+    historial?: IUbicacion[];
     rostrosReconocidos?: {
         idRandom: string;
         permanecio: boolean;
         fechaHora: Date;
     }[];
-    _idConductores?: Schema.Types.ObjectId[];
-    gananciasTotales: () => number;   
+    _idPropietario: Schema.Types.ObjectId[];
 }
+
+const IUbicacionSchema = new Schema<IUbicacion>({
+    fecha: {
+        type: Date,
+        required: true
+    },
+    lat: {
+        type: Number,
+        required: true
+    },
+    long: {
+        type: Number,
+        required: true
+    }
+});
 
 const kitSchema = new Schema<IKit>({
     apodo: {
         type: String,
         required: true
     },
-    ubicacion: {
-        lat: {
-            type: Number,
-            required: true
-        },
-        long: {
-            type: Number,
-            required: true
-        }
-    },
+    ubicacion: IUbicacionSchema,
+    historial: [IUbicacionSchema],
     rostrosReconocidos: [{
         idRandom: {
             type: String            
@@ -41,7 +51,7 @@ const kitSchema = new Schema<IKit>({
             type: Date            
         }
     }],
-    _idConductores: [{
+    _idPropietario: [{
         type: Schema.Types.ObjectId,
         ref: 'Usuarios'
     }]
