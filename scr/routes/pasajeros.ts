@@ -66,30 +66,30 @@ router.get('/ganancias/dia', async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Error calculando las ganancias diarias', error });
     }
 });
+router.post('/api/ganancias/semana', async (req: Request, res: Response) => {
+  const { fechaInicio, fechaFin } = req.body;
 
-router.get('/ganancias/semana', async (req: Request, res: Response) => {
-    const { fechaInicio, fechaFin } = req.query;
+  try {
+    const pasajeros = await PasajerosPorDia.find({
+      fecha: {
+        $gte: new Date(fechaInicio),
+        $lte: new Date(fechaFin)
+      }
+    });
+    const TARIFA_POR_PASAJERO = 20; 
+    const gananciasPorDia = pasajeros.reduce((acc, dia) => {
+      const day = new Date(dia.fecha).getDay();
+      acc[day] = (acc[day] || 0) + (dia.cantidad * TARIFA_POR_PASAJERO);
+      return acc;
+    }, {} as { [key: number]: number });
 
-    try {
-        const pasajeros = await PasajerosPorDia.find({
-            fecha: {
-                $gte: new Date(fechaInicio as string),
-                $lte: new Date(fechaFin as string)
-            }
-        });
-        const gananciasPorDia = pasajeros.reduce((acc, dia) => {
-            const day = new Date(dia.fecha).getDay();
-            acc[day] = (acc[day] || 0) + (dia.cantidad * TARIFA_POR_PASAJERO);
-            return acc;
-        }, {} as { [key: number]: number });
+    const earnings = Array(7).fill(0).map((_, i) => gananciasPorDia[i] || 0);
+    const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
-        const earnings = Array(7).fill(0).map((_, i) => gananciasPorDia[i] || 0);
-        const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-
-        res.json({ days, earnings });
-    } catch (error) {
-        res.status(500).json({ message: 'Error calculando las ganancias semanales', error });
-    }
+    res.json({ days, earnings });
+  } catch (error) {
+    res.status(500).json({ message: 'Error calculando las ganancias semanales', error });
+  }
 });
 
 export default router;
