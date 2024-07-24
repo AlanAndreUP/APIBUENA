@@ -114,7 +114,7 @@ router.get('/info/:_id', async (req: IUserRequest, res: Response) => {
 
     try {
         const user = await Usuario.findById(_id).select('-password');
-        if (!user) return res.status(400).json({ message: 'Usuario no encontrado' });
+        if (!user) return res.status(400).json({ message: 'Usuario no encontrado ' });
 
         res.json(user);
     } catch (error) {
