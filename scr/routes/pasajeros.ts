@@ -66,7 +66,7 @@ router.get('/ganancias/dia', async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Error calculando las ganancias diarias', error });
     }
 });
-router.post('/api/ganancias/semana', async (req: Request, res: Response) => {
+router.post('/ganancias/semana', async (req: Request, res: Response) => {
   const { fechaInicio, fechaFin } = req.body;
 
   try {
