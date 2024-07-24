@@ -109,11 +109,11 @@ router.put('/update-horarios', async (req: IUserRequest, res: Response) => {
     }
 });
 
-router.get('/info/:userId', async (req: IUserRequest, res: Response) => {
-    const userId = req.params;
+router.get('/info/:_id', async (req: IUserRequest, res: Response) => {
+    const _id = req.params;
 
     try {
-        const user = await Usuario.findById(userId).select('-password');
+        const user = await Usuario.findById(_id).select('-password');
         if (!user) return res.status(400).json({ message: 'Usuario no encontrado' });
 
         res.json(user);
