@@ -68,15 +68,32 @@ router.get('/ganancias/dia', async (req: Request, res: Response) => {
 });
 router.post('/ganancias/semana', async (req: Request, res: Response) => {
   const { fechaInicio, fechaFin } = req.body;
+  console.log('Fecha Inicio:', fechaInicio);
+  console.log('Fecha Fin:', fechaFin);
 
   try {
+    const startDate = new Date(fechaInicio.replace(' ', 'T') + 'Z');
+    const endDate = new Date(fechaFin.replace(' ', 'T') + 'Z');
+
+    console.log('Fecha de Inicio Convertida:', startDate.toISOString());
+    console.log('Fecha de Fin Convertida:', endDate.toISOString());
+
+    // Formatear las fechas al formato de cadena para la comparación en la base de datos
+    const startDateStr = startDate.toISOString().replace('T', ' ').slice(0, 19);
+    const endDateStr = endDate.toISOString().replace('T', ' ').slice(0, 19);
+    console.log('Fecha de Inicio para Consulta:', startDateStr);
+    console.log('Fecha de Fin para Consulta:', endDateStr);
+
+    // Consulta de MongoDB
     const pasajeros = await PasajerosPorDia.find({
       fecha: {
-        $gte: new Date(fechaInicio),
-        $lte: new Date(fechaFin)
+        $gte: startDateStr,
+        $lte: endDateStr
       }
-    });
-    const TARIFA_POR_PASAJERO = 20; 
+    }).exec();
+
+
+    const TARIFA_POR_PASAJERO = 20;
     const gananciasPorDia = pasajeros.reduce((acc, dia) => {
       const day = new Date(dia.fecha).getDay();
       acc[day] = (acc[day] || 0) + (dia.cantidad * TARIFA_POR_PASAJERO);
