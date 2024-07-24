@@ -109,7 +109,7 @@ router.put('/update-horarios', async (req: IUserRequest, res: Response) => {
     }
 });
 
-router.get('/info', async (req: IUserRequest, res: Response) => {
+router.get('/info/:userId', async (req: IUserRequest, res: Response) => {
     const userId = req.params;
 
     try {
