@@ -110,7 +110,7 @@ router.put('/update-horarios', async (req: IUserRequest, res: Response) => {
 });
 
 router.get('/info', async (req: IUserRequest, res: Response) => {
-    const userId = req.user?.id;
+    const userId = req.params;
 
     try {
         const user = await Usuario.findById(userId).select('-password');
