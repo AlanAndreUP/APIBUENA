@@ -40,12 +40,17 @@ router.post('/', async (req: Request, res: Response) => {
 
 
 router.put('/unidad/:placaId', async (req: Request, res: Response) => {
-    const placaId = req.params;
-    if(!placaId) return res.status(400).json({ message: 'No se envio la placa de la unidad' });
+    const { placaId } = req.params;
+    if(!placaId) return res.status(400).json({ message: 'No se envió la placa de la unidad' });
     const { placa, modelo, chofer, activo, _idKit } = req.body;
 
     try {
-        const unidadActualizada = await Unidad.findOneAndUpdate({ placa, modelo, chofer, activo, _idKit }, { new: true });
+        const unidadActualizada = await Unidad.findOneAndUpdate(
+            { placa: placaId },  
+            { placa, modelo, chofer, activo, _idKit },  
+            { new: true }  
+        );
+        
         if (!unidadActualizada) {
             return res.status(404).json({ message: 'Unidad no encontrada' });
         }
