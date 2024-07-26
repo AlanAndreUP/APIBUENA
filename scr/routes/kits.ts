@@ -56,7 +56,7 @@ router.get("/:_idKit/gps/historial", authenticateToken, async (req: Request, res
     }
 });
 
-router.get('/gps/historial', authenticateToken, async (req: Request, res: Response) => {
+router.post('/gps/historial', async (req: Request, res: Response) => {
     try {
         const fechaUsuario = new Date();
         let falseUsuario = new Date(fechaUsuario.getTime() - (2 * 60 * 60 * 1000))
