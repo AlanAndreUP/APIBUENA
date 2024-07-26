@@ -34,6 +34,32 @@ router.post('/create', async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Error registrando el usuario', error });
     }
 })
+router.put('/users/:id', async (req: Request, res: Response) => {
+    const { nombre, correo, password, tipo } = req.body;
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const updatedUser = await Usuario.findByIdAndUpdate(req.params.id, { nombre, correo, password: hashedPassword, tipo }, { new: true });
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+        res.status(200).json({ message: 'Usuario actualizado exitosamente', data: updatedUser });
+    } catch (error) {
+        res.status(500).json({ message: 'Error actualizando el usuario', error });
+    }
+});
+router.delete('/users/:id', async (req: Request, res: Response) => {
+    try {
+        const deletedUser = await Usuario.findByIdAndDelete(req.params.id);
+        if (!deletedUser) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+        res.status(200).json({ message: 'Usuario eliminado exitosamente' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error eliminando el usuario', error });
+    }
+});
+
 
 router.post('/register', async (req: Request, res: Response) => {
     const { nombre, correo, password } = req.body;
