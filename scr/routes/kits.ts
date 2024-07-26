@@ -2,12 +2,14 @@ import { Request, Response, NextFunction, RequestHandler, Router } from 'express
 import jwt from 'jsonwebtoken';
 import Kit, { IKit, IUbicacion } from "../models/kitSchema";
 import { Types } from 'mongoose';
+import Unidad, { IUnidad } from '../models/unidadSchema';
 
 const router = Router();
 
 interface IHistorialUnidad {
     _idKit: Types.ObjectId | string;
     historial: IUbicacion[];
+    conductor: string;
 }
 
 interface IKitRequest extends Request {
@@ -70,7 +72,7 @@ router.get('/gps/historial', async (req: Request, res: Response) => {
 
         let unidades: IHistorialUnidad[] = [];
 
-        kits.forEach(kit => {
+        kits.forEach(async kit => {
             if (!kit.historial) return;
 
             let historial: IUbicacion[] = kit.historial.filter(ubi => {
@@ -79,8 +81,13 @@ router.get('/gps/historial', async (req: Request, res: Response) => {
             });
 
             if (historial.length > 0) {
-                unidades.push({ _idKit: kit._id.toString(), historial });
+                const unidad = await Unidad.find({ _idKit: kit._id });
+                unidades.push({
+                    _idKit: kit._id.toString(), historial,
+                    conductor: unidad[0].chofer
+                });
             }
+           
         });
 
         return res.status(200).json({ unidades });
