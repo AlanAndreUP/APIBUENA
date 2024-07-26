@@ -108,4 +108,31 @@ router.post('/ganancias/semana', async (req: Request, res: Response) => {
   }
 });
 
+
+router.get('/ganancias/mes-actual', async (req: Request, res: Response) => {
+    try {
+      const now = new Date();
+      const primerDiaDelMes = new Date(now.getFullYear(), now.getMonth(), 1);
+      const primerDiaDelProximoMes = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      const fechaInicio = primerDiaDelMes.toISOString().replace('T', ' ').slice(0, 19);
+      const fechaFin = primerDiaDelProximoMes.toISOString().replace('T', ' ').slice(0, 19);
+      const pasajeros = await PasajerosPorDia.find({
+        fecha: {
+          $gte: fechaInicio,
+          $lt: fechaFin
+        }
+      }).exec();
+      const gananciasTotales = pasajeros.reduce((total, dia) => {
+        return total + (dia.cantidad * TARIFA_POR_PASAJERO);
+      }, 0);
+  
+      res.json({
+        mes: now.toLocaleString('default', { month: 'long' }),
+        año: now.getFullYear(),
+        gananciasTotales
+      });
+    } catch (error) {
+      res.status(500).json({ message: 'Error calculando las ganancias del mes actual', error });
+    }
+  });
 export default router;
