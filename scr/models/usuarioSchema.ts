@@ -26,7 +26,6 @@ export interface IUsuario {
 }
 
 const usuarioSchema = new Schema<IUsuario>({
-    _id: Schema.Types.ObjectId,
     nombre:{
         type: String,
         required: true
