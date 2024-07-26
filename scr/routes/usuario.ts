@@ -34,7 +34,7 @@ router.post('/create', async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Error registrando el usuario', error });
     }
 })
-router.put('/users/:id', async (req: Request, res: Response) => {
+router.put('/users/:_id', async (req: Request, res: Response) => {
     const { nombre, correo, password, tipo } = req.body;
     const _id = req.params;
 
@@ -49,7 +49,7 @@ router.put('/users/:id', async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Error actualizando el usuario', error });
     }
 });
-router.delete('/users/:id', async (req: Request, res: Response) => {
+router.delete('/users/:_id', async (req: Request, res: Response) => {
     const _id = req.params;
     try {
         const deletedUser = await Usuario.findByIdAndDelete(_id);
