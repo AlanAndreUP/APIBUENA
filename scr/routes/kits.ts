@@ -70,24 +70,23 @@ router.get('/gps/historial', async (req: Request, res: Response) => {
         if (!kits || kits.length === 0) return res.status(400).json({ message: 'No se encontraron kits' });
 
         let unidades: IHistorialUnidad[] = [];
-
-        kits.forEach(async kit => {
+        const unidad = await Unidad.find({ _idKit: kits[0]._id });
+        kits.forEach( kit => {
             if (!kit.historial) return;
 
             let historial: IUbicacion[] = kit.historial.filter(ubi => {
                 const fechaUbi = new Date(ubi.fecha);
                 return fechaUbi >= fechaUnaHoraAntes && fechaUbi <= fechaUsuario;
             });
-
-            if (historial.length > 0) {
-                const unidad = await Unidad.find({ _idKit: kit._id });
+              
+                console.log(unidad);
                 unidades.push({
                     _idKit: kit._id.toString(), historial,
                     conductor: unidad[0].chofer
                 });
-            }
-           
+            
         });
+        console.log(unidades);
 
         return res.status(200).json({ unidades });
     } catch (error) {
