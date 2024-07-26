@@ -73,8 +73,8 @@ router.get('/gps/historial', async (req: Request, res: Response) => {
         if (!kits || kits.length === 0) return res.status(400).json({ message: 'No se encontraron kits' });
 
         let unidades: IHistorialUnidad[] = [];
-        const unidad = await Unidad.find({ _idKit: kits[0]._id });
-        kits.forEach( kit => {
+
+        kits.forEach(async kit => {
             if (!kit.historial) return;
 
             let historial: IUbicacion[] = kit.historial.filter(ubi => {
