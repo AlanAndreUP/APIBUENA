@@ -78,13 +78,12 @@ router.post('/ganancias/semana', async (req: Request, res: Response) => {
     console.log('Fecha de Inicio Convertida:', startDate.toISOString());
     console.log('Fecha de Fin Convertida:', endDate.toISOString());
 
-    // Formatear las fechas al formato de cadena para la comparación en la base de datos
+    
     const startDateStr = startDate.toISOString().replace('T', ' ').slice(0, 19);
     const endDateStr = endDate.toISOString().replace('T', ' ').slice(0, 19);
     console.log('Fecha de Inicio para Consulta:', startDateStr);
     console.log('Fecha de Fin para Consulta:', endDateStr);
 
-    // Consulta de MongoDB
     const pasajeros = await PasajerosPorDia.find({
       fecha: {
         $gte: startDateStr,
