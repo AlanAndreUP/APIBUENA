@@ -4,7 +4,6 @@ import Kit, { IKit, IUbicacion } from "../models/kitSchema";
 import { Types } from 'mongoose';
 
 const router = Router();
-const JWT_SECRET = process.env.JWT_SECRET ?? 'XDEJUEMPLO';
 
 interface IHistorialUnidad {
     _idKit: Types.ObjectId | string;
@@ -19,7 +18,7 @@ const authenticateToken: RequestHandler = (req: IKitRequest, res: Response, next
     const token = req.headers['authorization']?.split(' ')[1];
     if (!token) return res.status(401).json({ message: 'No se proporciono token' });
 
-    jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
+    jwt.verify(token, (process.env.JWT_SECRET ?? 'XDEJUEMPLO'), (err: any, user: any) => {
         if (err) return res.status(403).json({ message: 'Token no válido' });
         req.user = user;
         next();
