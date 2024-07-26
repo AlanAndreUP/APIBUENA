@@ -124,7 +124,7 @@ router.get('/info/:_id', async (req: IUserRequest, res: Response) => {
 
 router.get('/drivers', async (req: IUserRequest, res: Response) => {
     try {
-        const drivers = await Usuario.find({ tipo: 'conductor' }).select('-password');
+        const drivers = await Usuario.find({ tipo: 'cliente' }).select('-password');
         res.json(drivers);
     } catch (error) {
         res.status(500).json({ message: 'Error obteniendo los conductores', error });

@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction, RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
-import { IUsuario } from '../models/usuarioSchema';
+import Usuario, { IUsuario } from '../models/usuarioSchema';
 import PasajerosPorDia from '../models/pasajeros';
 
 const router = express.Router();
@@ -125,11 +125,12 @@ router.get('/ganancias/mes-actual', async (req: Request, res: Response) => {
       const gananciasTotales = pasajeros.reduce((total, dia) => {
         return total + (dia.cantidad * TARIFA_POR_PASAJERO);
       }, 0);
-  
+      const drivers = await Usuario.find({ tipo: 'cliente' }).select('-password');
       res.json({
         mes: now.toLocaleString('default', { month: 'long' }),
         año: now.getFullYear(),
-        gananciasTotales
+        gananciasTotales,
+        conductores: drivers.length
       });
     } catch (error) {
       res.status(500).json({ message: 'Error calculando las ganancias del mes actual', error });
