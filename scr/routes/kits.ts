@@ -121,10 +121,14 @@ router.post('/kit', authenticateToken, async (req: Request, res: Response) => {
 router.put('/:_idKit/gps', async (req: Request, res: Response) => {
     try {
         if(!req.params._idKit) return res.status(400).json({ message: 'No se envio el id del kit' });
-        const { ubicacion } = req.body;
+        const ubicacion = {
+            lat: req.body.lat,
+            long: req.body.long,
+            fecha: new Date()
+        };
         if(!ubicacion) return res.status(400).json({ message: 'No se envio la ubicacion' });
-        const kit = await Kit.findByIdAndUpdate(req.params._idKit, { 
-            $push: { ubicaciones: ubicacion } }, { new: true, upsert: true });
+        const kit = await Kit.findByIdAndUpdate(req.params._idKit, 
+            { $push: { ubicaciones: ubicacion } }, { new: true, upsert: true });
 
         if(!kit) return res.status(400).json({ message: 'No se encontro el kit' });
 
