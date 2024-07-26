@@ -5,7 +5,7 @@ import Usuario, { IUsuario } from '../models/usuarioSchema';
 import Kit from '../models/kitSchema';
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET ?? 'XDEJUEMPLO';
+let JWT_SECRET = process.env.JWT_SECRET ?? 'XDEJUEMPLO';
 
 interface IUserRequest extends Request {
     user?: IUsuario & { id: string };
@@ -58,7 +58,7 @@ router.post('/login', async (req: Request, res: Response) => {
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) return res.status(400).json({ message: 'Correo o contraseña incorrectos' });
 
-        const token = jwt.sign({ id: user._id, tipo: user.tipo }, JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user._id, tipo: user.tipo }, "XDEJUEMPLO", { expiresIn: '1h' });
         return res.status(201).json({ token, user });
     } catch (error) {
         res.status(500).json({ message: 'Error en el inicio de sesión', error });
