@@ -26,6 +26,18 @@ router.get('/unidad/:placa', async (req: Request, res: Response) => {
     }
 });
 
+router.get('/kit/:_idKit', async (req: Request, res: Response) => {
+    const { _idKit } = req.params;
+    try {
+        const unidad = await Unidad.find({ _idKit: _idKit });
+        if(!unidad) return res.status(404).json({ message: 'Unidad no encontrada' });
+
+        return res.status(200).json(unidad);
+    } catch (error) {
+        return res.status(500).json({ message: 'Error obteniendo la unidad', error });
+    }
+});
+
 router.post('/', async (req: Request, res: Response) => {
     const { placa, modelo, chofer, activo, _idKit } = req.body;
 
