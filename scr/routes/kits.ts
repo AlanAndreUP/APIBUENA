@@ -89,7 +89,7 @@ router.get('/gps/historial', authenticateToken, async (req: Request, res: Respon
     }
 });
 
-router.post('/kit', authenticateToken, async (req: Request, res: Response) => {
+router.post('/kit', async (req: Request, res: Response) => {
     try {
         const { apodo } = req.body;
         if(!apodo) {
