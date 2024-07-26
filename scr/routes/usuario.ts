@@ -36,10 +36,11 @@ router.post('/create', async (req: Request, res: Response) => {
 })
 router.put('/users/:id', async (req: Request, res: Response) => {
     const { nombre, correo, password, tipo } = req.body;
+    const _id = req.params;
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        const updatedUser = await Usuario.findByIdAndUpdate(req.params.id, { nombre, correo, password: hashedPassword, tipo }, { new: true });
+        const updatedUser = await Usuario.findByIdAndUpdate(_id, { nombre, correo, password: hashedPassword, tipo }, { new: true });
         if (!updatedUser) {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
@@ -49,8 +50,9 @@ router.put('/users/:id', async (req: Request, res: Response) => {
     }
 });
 router.delete('/users/:id', async (req: Request, res: Response) => {
+    const _id = req.params;
     try {
-        const deletedUser = await Usuario.findByIdAndDelete(req.params.id);
+        const deletedUser = await Usuario.findByIdAndDelete(_id);
         if (!deletedUser) {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
