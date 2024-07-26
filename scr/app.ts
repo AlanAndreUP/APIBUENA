@@ -7,6 +7,7 @@ import { WebSocketServer } from 'ws';
 import pasajerosRoutes from './routes/pasajeros'; 
 import usuariosRoutes from './routes/usuario';
 import kitsRoutes from './routes/kits';
+import unidadesRoutes from './routes/unidades';
 
 config();
 
@@ -46,6 +47,7 @@ app.use(morgan('dev'));
 app.use('/pasajeros', pasajerosRoutes);  
 app.use('/users', usuariosRoutes);
 app.use('/kits', kitsRoutes);
+app.use("/unidades", unidadesRoutes);
 
 const wss = new WebSocketServer({ port: 4001 });
 

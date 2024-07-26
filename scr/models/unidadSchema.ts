@@ -5,6 +5,7 @@ export interface IUnidad {
     placa: string,
     modelo: string,
     chofer: string,
+    activo: boolean,
     _idKit: Schema.Types.ObjectId
 }
 
@@ -20,6 +21,10 @@ const unidadSchema = new Schema<IUnidad>({
     chofer: {
         type: String,
         required: true
+    },
+    activo: {
+        type: Boolean,
+        default: false
     },
     _idKit: {
         type: Schema.Types.ObjectId,
