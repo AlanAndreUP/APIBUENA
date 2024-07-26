@@ -56,14 +56,14 @@ router.get("/:_idKit/gps/historial", authenticateToken, async (req: Request, res
     }
 });
 
-router.post('/gps/historial', async (req: Request, res: Response) => {
+router.get('/gps/historial', authenticateToken, async (req: Request, res: Response) => {
     try {
         const fechaUsuario = new Date();
         let falseUsuario = new Date(fechaUsuario.getTime() - (2 * 60 * 60 * 1000))
         const fechaUnaHoraAntes = new Date(falseUsuario.getTime() - (24 * 60 * 60 * 1000)); // 1 día antes
 
         let kits = await Kit.find({
-            "historial.fecha": { $gte: fechaUnaHoraAntes, $lte: falseUsuario }
+            "historial.fecha": { $gte: fechaUnaHoraAntes, $lte: fechaUsuario }
         });
 
         if (!kits || kits.length === 0) return res.status(400).json({ message: 'No se encontraron kits' });
