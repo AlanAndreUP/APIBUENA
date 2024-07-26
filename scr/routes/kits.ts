@@ -56,7 +56,7 @@ router.get("/:_idKit/gps/historial", authenticateToken, async (req: Request, res
     }
 });
 
-router.post('/gps/historial', authenticateToken, async (req: Request, res: Response) => {
+router.post('/gps/historial', async (req: Request, res: Response) => {
     try {
         const { lat, long } = req.body;
 
