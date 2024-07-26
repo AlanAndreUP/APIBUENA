@@ -45,7 +45,7 @@ router.put('/unidad/:placaId', async (req: Request, res: Response) => {
     const { placa, modelo, chofer, activo, _idKit } = req.body;
 
     try {
-        const unidadActualizada = await Unidad.findOneAndUpdate({ placa, modelo, chofer, activo, _idKit }, { new: true });
+        const unidadActualizada = await Unidad.findOneAndUpdate({ placa:placa, modelo:modelo, chofer:chofer, activo:activo, _idKit:_idKit }, { new: true });
         if (!unidadActualizada) {
             return res.status(404).json({ message: 'Unidad no encontrada' });
         }
