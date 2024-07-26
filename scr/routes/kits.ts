@@ -7,7 +7,7 @@ const router = Router();
 
 interface IHistorialUnidad {
     _idKit: Types.ObjectId | string;
-    historial: Array<{ lat: number, long: number, fecha: Date }>;
+    historial: IUbicacion[];
 }
 
 interface IKitRequest extends Request {
@@ -56,48 +56,40 @@ router.get("/:_idKit/gps/historial", authenticateToken, async (req: Request, res
     }
 });
 
-router.get('/gps/historial', authenticateToken, async (req: Request, res: Response) => {
+router.post('/gps/historial', authenticateToken, async (req: Request, res: Response) => {
     try {
-        const { ubicacionUsuario } = req.body;
-        if (!ubicacionUsuario || !('lat' in ubicacionUsuario) || !('long' in ubicacionUsuario)) {
-            return res.status(400).json({ message: 'Ubicación de usuario inválida' });
-        }
+        const { lat, long } = req.body;
 
-        const kits = await Kit.find();
-        if (!kits) return res.status(400).json({ message: 'No se encontraron kits' });
+        if (!lat || !long) return res.status(400).json({ message: 'No se envió la ubicación' });
 
         const fechaUsuario = new Date();
         const fechaUnaHoraAntes = new Date(fechaUsuario.getTime() - (60 * 60 * 1000)); // 1 hora antes
 
+        const kits = await Kit.find({
+            "historial.fecha": { $gte: fechaUnaHoraAntes, $lte: fechaUsuario }
+        });
+
+        if (!kits || kits.length === 0) return res.status(400).json({ message: 'No se encontraron kits' });
+
         let unidades: IHistorialUnidad[] = [];
 
         kits.forEach(kit => {
-            if (!kit.ubicacion) return;
             if (!kit.historial) return;
 
-            let historial: IUbicacion[] = [];
-            kit.historial.forEach(ubi => {
-                if (!kit.ubicacion) return;
-                if (!kit.historial) return;
-
-            let historial: Array<{ lat: number, long: number, fecha: Date }> = [];
-            kit.historial.forEach(ubi => {
-                if (!ubi.lat || !ubi.long) return;
+            let historial: IUbicacion[] = kit.historial.filter(ubi => {
                 const fechaUbi = new Date(ubi.fecha);
-                if (fechaUbi >= fechaUnaHoraAntes && fechaUbi <= fechaUsuario) {
-                    historial.push({ lat: ubi.lat, long: ubi.long, fecha: ubi.fecha });
-                }
+                return fechaUbi >= fechaUnaHoraAntes && fechaUbi <= fechaUsuario;
             });
 
             if (historial.length > 0) {
-                unidades.push({ _idKit: kit._id, historial });
+                unidades.push({ _idKit: kit._id.toString(), historial });
             }
-        })
-    });
+        });
 
-        return res.status(200).json(unidades);
+        return res.status(200).json({ unidades });
     } catch (error) {
-        res.status(500).json({ message: 'Error obteniendo el historial de GPS', error });
+        console.log(error);
+        return res.status(500).json({ message: 'Error obteniendo el historial de ubicaciones', error });
     }
 });
 
@@ -120,17 +112,28 @@ router.post('/kit', authenticateToken, async (req: Request, res: Response) => {
 
 router.put('/:_idKit/gps', async (req: Request, res: Response) => {
     try {
-        if(!req.params._idKit) return res.status(400).json({ message: 'No se envio el id del kit' });
-        const ubicacion = {
-            lat: req.body.lat,
-            long: req.body.long,
+        const { _idKit } = req.params;
+        const { lat, long } = req.body;
+
+        if (!_idKit) return res.status(400).json({ message: 'No se envió el id del kit' });
+        if (lat === undefined || long === undefined) return res.status(400).json({ message: 'No se envió la ubicación' });
+
+        const nuevaUbicacion: IUbicacion = {
+            lat,
+            long,
             fecha: new Date()
         };
-        if(!ubicacion) return res.status(400).json({ message: 'No se envio la ubicacion' });
-        const kit = await Kit.findByIdAndUpdate(req.params._idKit, 
-            { $push: { ubicaciones: ubicacion } }, { new: true, upsert: true });
 
-        if(!kit) return res.status(400).json({ message: 'No se encontro el kit' });
+        const kit = await Kit.findByIdAndUpdate(
+            _idKit,
+            {
+                $set: { ubicacion: nuevaUbicacion },
+                $push: { historial: nuevaUbicacion }
+            },
+            { new: true, upsert: true }
+        );
+
+        if (!kit) return res.status(400).json({ message: 'No se encontró el kit' });
 
         return res.status(200).json(kit);
     } catch (error) {
