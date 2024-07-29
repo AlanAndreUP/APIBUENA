@@ -118,7 +118,7 @@ router.put('/:_idKit/gps', async (req: Request, res: Response) => {
         let lat = 16.61607339629603;
         let long= -93.09084688706723;
 
-        if (!_idKit) return res.status(400).json({ message: 'No se envió el id del kit' });
+        const { _idKit } = req.params;
            
         
 
