@@ -63,9 +63,7 @@ router.get('/gps/historial', async (req: Request, res: Response) => {
         const fechaUsuario = new Date();
         const fechaUnaHoraAntes = new Date(fechaUsuario.getTime() - (24 * 60 * 60 * 1000)); // 1 día antes
 
-        let kits = await Kit.find({
-            "historial.fecha": { $gte: fechaUnaHoraAntes, $lte: fechaUsuario }
-        });
+        let kits = await Kit.find();
 
         if (!kits || kits.length === 0) return res.status(400).json({ message: 'No se encontraron kits' });
 
