@@ -114,11 +114,14 @@ router.post('/kit', async (req: Request, res: Response) => {
 
 router.put('/:_idKit/gps', async (req: Request, res: Response) => {
     try {
-        const { _idKit } = req.params;
-        const { lat, long } = req.body;
+        let { _idKit } = req.params;
+        let { lat, long } = req.body;
 
         if (!_idKit) return res.status(400).json({ message: 'No se envió el id del kit' });
-        if (lat === undefined || long === undefined) return res.status(400).json({ message: 'No se envió la ubicación' });
+        if (lat === undefined || long === undefined) {
+            lat = 16.61607339629603;
+            long-93.09084688706723;
+        }
 
         const nuevaUbicacion: IUbicacion = {
             lat,
