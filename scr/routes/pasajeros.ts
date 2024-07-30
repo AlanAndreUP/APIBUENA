@@ -2,7 +2,10 @@ import express, { Request, Response, NextFunction, RequestHandler } from 'expres
 import jwt from 'jsonwebtoken';
 import Usuario, { IUsuario } from '../models/usuarioSchema';
 import PasajerosPorDia from '../models/pasajeros';
-import Unidad, { IUnidad } from '../models/unidadSchema';
+import Unidad from '../models/unidadSchema';
+import { startOfDay, endOfDay, subDays, addMinutes, formatISO } from 'date-fns';
+import signale from 'signale';
+
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET ?? 'XDEJUEMPLO';
@@ -22,6 +25,51 @@ const authenticateToken: RequestHandler = (req: IUserRequest, res: Response, nex
         next();
     });
 };
+
+router.post('/generate', async (req: Request, res: Response) => {
+  const { fecha } = req.body;
+
+  if (!fecha) {
+      return res.status(400).json({ message: 'Fecha es requerida' });
+  }
+
+  const endDate = new Date(fecha);
+  const startDate = subDays(startOfDay(endDate), 7);
+  
+  try {
+      let currentDate = startDate;
+
+      while (currentDate < endDate) {
+          let currentTime = new Date(currentDate.setHours(7, 0, 0, 0));
+          const endTime = new Date(currentDate.setHours(22, 0, 0, 0));
+
+          while (currentTime <= endTime) {
+              const cantidad = Math.floor(Math.random() * 31);
+              signale.info(`Generando cantidad ${cantidad} para fecha ${formatISO(currentTime)}`);
+
+              let pasajeros = await PasajerosPorDia.findOne({ fecha: formatISO(currentTime) });
+              
+              if (pasajeros) {
+                  pasajeros.cantidad += cantidad;
+              } else {
+                  pasajeros = new PasajerosPorDia({ fecha: formatISO(currentTime), cantidad });
+              }
+
+              await pasajeros.save();
+              signale.success(`Guardado para ${formatISO(currentTime)}`);
+
+              currentTime = addMinutes(currentTime, 15);
+          }
+
+          currentDate = addMinutes(new Date(currentDate.setHours(0, 0, 0, 0)), 24 * 60);
+      }
+
+      res.status(201).json({ message: 'Datos generados y registrados exitosamente' });
+  } catch (error) {
+      signale.error(error);
+      res.status(500).json({ message: 'Error generando los datos', error });
+  }
+});
 
 router.post('/', async (req: Request, res: Response) => {
     const { fecha, cantidad } = req.body;
@@ -53,7 +101,6 @@ router.get('/', async (req: Request, res: Response) => {
     }
 });
 
-// Rutas para calcular las ganancias
 router.get('/ganancias/dia', async (req: Request, res: Response) => {
     const { fecha } = req.query;
 
@@ -109,6 +156,69 @@ router.post('/ganancias/semana', async (req: Request, res: Response) => {
   }
 });
 
+router.post('/ganancias/horas', async (req: Request, res: Response) => {
+  const { fecha } = req.body;
+
+  if (!fecha) {
+      return res.status(400).json({ message: 'Fecha es requerida' });
+  }
+
+  console.log('Fecha:', fecha);
+  const currentDate = new Date(fecha);
+  console.log('Fecha actual:', currentDate);
+  const startOfDayDate = startOfDay(currentDate);
+  const previousWeekDate = subDays(startOfDayDate, 7);
+
+  try {
+      let gananciasPorHora: { [key: number]: number } = {};
+      let probabilidadesPorHora: { [key: number]: number } = {};
+
+      const currentHour = currentDate.getUTCHours();
+      console.log('Current Hour:', currentHour);
+            
+      const pasajerosPrevios = await PasajerosPorDia.find({
+          fecha: {
+              $gte: formatISO(startOfDay(previousWeekDate)),
+              $lte: formatISO(endOfDay(previousWeekDate))
+          }
+      });
+      
+      const pasajerosPorHoraPrevios = pasajerosPrevios.reduce((acc, dia) => {
+          const hour = new Date(dia.fecha).getHours();
+          acc[hour] = (acc[hour] || 0) + dia.cantidad;
+          return acc;
+      }, {} as { [key: number]: number });
+      
+      for (let hour = 7; hour <= 21; hour++) {
+          const startTime = new Date(startOfDayDate.setHours(hour, 0, 0, 0));
+          const endTime = new Date(startOfDayDate.setHours(hour + 1, 0, 0, 0));
+
+          if (hour < currentHour) {              
+              const pasajerosActuales = await PasajerosPorDia.find({
+                  fecha: {
+                      $gte: formatISO(startTime),
+                      $lte: formatISO(endTime)
+                  }
+              });
+
+              const cantidadActual = pasajerosActuales.reduce((acc, dia) => acc + dia.cantidad, 0);
+              const ganancias = cantidadActual * TARIFA_POR_PASAJERO;
+              gananciasPorHora[hour] = ganancias;
+              signale.info(`Ganancias para ${hour}:00-${hour + 1}:00 -> ${ganancias}`);
+          } else {              
+              const cantidadPrevios = pasajerosPorHoraPrevios[hour] || 0;
+              const probabilidad = cantidadPrevios / Object.values(pasajerosPorHoraPrevios).reduce((a, b) => a + b, 0);
+              probabilidadesPorHora[hour] = probabilidad;
+              signale.info(`Probabilidad para ${hour}:00-${hour + 1}:00 -> ${probabilidad}`);
+          }
+      }
+
+      res.json({ gananciasPorHora, probabilidadesPorHora });
+  } catch (error) {
+      signale.error(error);
+      res.status(500).json({ message: 'Error calculando las ganancias por hora', error });
+  }
+});
 
 router.get('/ganancias/mes-actual', async (req: Request, res: Response) => {
     try {
