@@ -116,8 +116,8 @@ router.post('/kit', async (req: Request, res: Response) => {
 
 router.put('/:_idKit/gps', async (req: Request, res: Response) => {
     try {
-        let lat = 16.61607339629603;
-        let long= -93.09084688706723;
+        let lat = 16.61426326662699;
+        let long= -93.09143637959407;
 
         const { _idKit } = req.params;
            
