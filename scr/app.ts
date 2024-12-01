@@ -63,3 +63,4 @@ wss.on('connection', (ws) => {
 app.listen(port, () => {
   console.log(`Servidor en ejecución en el puerto ${port}`);
 });
+export default app;

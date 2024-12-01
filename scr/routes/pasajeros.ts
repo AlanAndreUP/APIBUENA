@@ -95,7 +95,7 @@ router.get('/', async (req: Request, res: Response) => {
         const pasajeros = await PasajerosPorDia.findOne({ fecha });
         if (!pasajeros) return res.status(400).json({ message: 'No se encontraron registros para la fecha proporcionada' });
 
-        res.json({ fecha: pasajeros.fecha, cantidad: pasajeros.cantidad });
+        res.status(200).json({ fecha: pasajeros.fecha, cantidad: pasajeros.cantidad });
     } catch (error) {
         res.status(500).json({ message: 'Error obteniendo la cantidad de pasajeros', error });
     }
