@@ -57,6 +57,6 @@ const kitSchema = new Schema<IKit>({
     }]
 });
 
-const Kit = model<IKit>('Kits', kitSchema)
+const Kit = model<IKit>('kits', kitSchema)
 
 export default Kit

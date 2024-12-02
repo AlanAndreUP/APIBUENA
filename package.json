@@ -37,7 +37,8 @@
     "mongoose": "^7.6.4",
     "morgan": "^1.10.0",
     "nodemon": "^3.0.1",
-    "signale": "^1.4.0"
+    "signale": "^1.4.0",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@types/jest": "^29.5.13",

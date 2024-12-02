@@ -2,9 +2,13 @@ import express, { Application } from 'express';
 import mongoose from 'mongoose';
 import { config } from 'dotenv';
 import morgan from 'morgan';
+import cluster from 'cluster';
+import { cpus } from 'os';
 import { userRoute, pasajeroRoute, unidadesRoute, kitRoute } from './routes';
 
 config();
+
+const numCPUs = cpus().length;
 
 class Server {
   public app: Application;
@@ -15,9 +19,6 @@ class Server {
     this.app = express();
     this.port = process.env.PORT || '4000';
     this.uri = process.env.MONGODB_URI!;
-    this.middlewares();
-    this.connectDB();
-    this.routes();
   }
 
   async connectDB(): Promise<void> {
@@ -25,6 +26,9 @@ class Server {
       await mongoose.connect(this.uri, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
+        serverSelectionTimeoutMS: 30000, 
+        socketTimeoutMS: 45000,
+        maxPoolSize: numCPUs * 2,
       } as mongoose.ConnectOptions);
 
       const db = mongoose.connection;
@@ -34,7 +38,7 @@ class Server {
       });
 
       db.once('open', () => {
-        console.log('Conexión exitosa a la base de datos MongoDB.');
+        console.log(`Conexión exitosa a la base de datos MongoDB. Worker ${process.pid}`);
       });
     } catch (error) {
       console.error('Error al conectar a la base de datos:', error);
@@ -66,18 +70,34 @@ class Server {
     this.app.get('/', (req, res) => {
       res.status(200).json({
         message: `Servidor API en ejecución en el puerto ${this.port}`,
+        worker: process.pid
       });
     });
   }
 
   listen(): void {
     this.app.listen(this.port, () => {
-      console.log(`Servidor en ejecución en el puerto ${this.port}`);
+      console.log(`Worker ${process.pid} iniciado en puerto ${this.port}`);
     });
   }
 }
 
-const server = new Server();
-server.listen();
 
-export default server.app;
+if (cluster.isPrimary) {
+  console.log(`Master ${process.pid} está corriendo`);
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`Worker ${worker.process.pid} murió`);
+    cluster.fork();
+  });
+} else {
+  const server = new Server();
+  server.connectDB();
+  server.middlewares();
+  server.routes();
+  server.listen();
+}
+
+export default cluster.isPrimary ? null : Server;
