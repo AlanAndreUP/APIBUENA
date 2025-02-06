@@ -18,7 +18,7 @@ export const loginUser = async (req: Request, res: Response) => {
     const { correo, password } = req.body;
     try {
         const user = await userRepository.findUserByEmail(correo);
-        if (!user || !(await userRepository.comparePasswords(password, user.password!))) {
+        if (!user || !(await userRepository.comparePasswords(password, user.password))) {
             return res.status(400).json({ message: 'Correo o contraseña incorrectos' });
         }
         const token = jwt.sign({ id: user._id, tipo: user.tipo }, JWT_SECRET, { expiresIn: '1h' });
@@ -64,5 +64,17 @@ export const getDrivers = async (_req: Request, res: Response) => {
         res.json(drivers);
     } catch (error) {
         res.status(500).json({ message: 'Error obteniendo los conductores', error });
+    }
+};
+
+export const loginByCamera = async (req: Request, res: Response) => {
+    const { base64 } = req.body;
+    try {
+        const user = await userRepository.findUserByImagen(base64);
+        if(!user) return res.status(400).json({ message: 'No se encontro el usuario' });
+        const token = jwt.sign({ id: user._id, tipo: user.tipo }, JWT_SECRET, { expiresIn: '1h' });
+        res.status(200).json({ token, user });
+    } catch (error) {
+        res.status(500).json({ message: 'Error en el inicio de sesión', error });
     }
 };

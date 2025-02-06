@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { pasajerosRepository } from '../repositories';
 import signale from 'signale';
-import { formatISO, startOfDay, endOfDay, subDays, addMinutes } from 'date-fns';
+import { formatISO, startOfDay, subDays, addMinutes } from 'date-fns';
 
 const TARIFA_POR_PASAJERO = 20;
 

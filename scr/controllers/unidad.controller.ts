@@ -13,7 +13,7 @@ export const getAllUnidades = async (req: Request, res: Response) => {
 export const getUnidadByPlaca = async (req: Request, res: Response) => {
     const { placa } = req.params || {};
     try {
-        const unidad = await unidadRepository.getUnidadByPlaca(placa!);
+        const unidad = await unidadRepository.getUnidadByPlaca(placa);
         if (!unidad) {
             return res.status(404).json({ message: 'Unidad no encontrada' });
         }
@@ -26,7 +26,7 @@ export const getUnidadByPlaca = async (req: Request, res: Response) => {
 export const getUnidadesByKitId = async (req: Request, res: Response) => {
     const { _idKit } = req.params || {};
     try {
-        const unidades = await unidadRepository.getUnidadesByKitId(_idKit!);
+        const unidades = await unidadRepository.getUnidadesByKitId(_idKit);
         if (unidades.length === 0) {
             return res.status(404).json({ message: 'Unidades no encontradas' });
         }
@@ -50,7 +50,7 @@ export const updateUnidadByPlaca = async (req: Request, res: Response) => {
     const { placaId } = req.params || {};
     try {
         const body = req.body;
-        const unidadActualizada = await unidadRepository.updateUnidadByPlaca(placaId!, body);
+        const unidadActualizada = await unidadRepository.updateUnidadByPlaca(placaId, body);
         if (!unidadActualizada) {
             return res.status(404).json({ message: 'Unidad no encontrada' });
         }
@@ -63,7 +63,7 @@ export const updateUnidadByPlaca = async (req: Request, res: Response) => {
 export const deleteUnidadById = async (req: Request, res: Response) => {
     const { id } = req.params || {};
     try {
-        const unidadEliminada = await unidadRepository.deleteUnidadById(id!);
+        const unidadEliminada = await unidadRepository.deleteUnidadById(id);
         if (!unidadEliminada) {
             return res.status(404).json({ message: 'Unidad no encontrada' });
         }

@@ -22,6 +22,10 @@ export const findUserByEmail = async (correo: string) => {
     return await Usuario.findOne({ correo });
 };
 
+export const findUserByImagen = async (imagen: string) => {
+    return await Usuario.findById({_id: "67891b087a17f6653b9a8154"});
+}
+
 export const comparePasswords = async (plainPassword: string, hashedPassword: string) => {
     return await bcrypt.compare(plainPassword, hashedPassword);
 };
